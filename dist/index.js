@@ -6390,11 +6390,12 @@ async function run() {
 
   const octokit = github.getOctokit(token)
 
-  const timeline = await octokit.rest.issues.listEventsForTimeline({
+  const timelineResponse = await octokit.rest.issues.listEventsForTimeline({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     issue_number: github.context.issue.number
   });
+  const timeline = timelineResponse.data
 
   console.log(timeline)
 
