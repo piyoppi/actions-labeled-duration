@@ -1,0 +1,5 @@
+name: 'Test actions'
+description: 'Test'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'

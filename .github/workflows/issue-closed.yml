@@ -1,0 +1,14 @@
+name: ci
+
+on:
+  issues:
+    types:
+      - closed
+      - labeled
+
+jobs:
+  closed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report
+        uses: piyoppi/repository-playground
