@@ -4,7 +4,6 @@ on:
   issues:
     types:
       - closed
-      - labeled
 
 jobs:
   closed:
