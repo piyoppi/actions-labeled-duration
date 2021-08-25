@@ -6317,14 +6317,14 @@ const github = __nccwpck_require__(531);
 const core = __nccwpck_require__(673);
 
 async function run() {
-  const token = core.getInput('myToken');
+  const token = core.getInput('access-token');
 
   const octokit = github.getOctokit(token)
 
   const timeline = await octokit.rest.issues.listEventsForTimeline({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
-    repo: github.context.issue.number,
+    issue_number: github.context.issue.number
   });
 
   console.log(timeline);
