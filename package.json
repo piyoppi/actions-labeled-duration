@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "build": "ncc build src/index.js --license licenses.txt"
   },
   "dependencies": {
     "@actions/core": "^1.5.0",
@@ -8,6 +9,7 @@
     "dayjs": "^1.10.6"
   },
   "devDependencies": {
+    "@vercel/ncc": "^0.29.2",
     "jest": "^27.0.6"
   }
 }
