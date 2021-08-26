@@ -16,3 +16,4 @@ jobs:
         with:
           access-token: ${{ secrets.GITHUB_TOKEN }}
           labels: label1,label2,ラベルA
+          project_columns: TODO,Doing
