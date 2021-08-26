@@ -6170,30 +6170,44 @@ function wrappy (fn, cb) {
 /***/ 343:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const getDurations = (timeline) => {
-  const dayjs = __nccwpck_require__(401)
+const dayjs = __nccwpck_require__(401)
 
-  const labeledTimelineItems = timeline.filter(item => ['labeled', 'unlabeled'].includes(item.event))
-  const closedTimelineItem = timeline.filter(item => ['closed'].includes(item.event))[0] || null
+const timelineGroupByAttribute = (timeline, attrCallback) => {
+  const timelinesGroup = {}
 
-  const timelinesGroupByLabel = {} 
-  labeledTimelineItems.forEach(timelineItem => {
-    if (!timelinesGroupByLabel[timelineItem.label.name]) {
-      timelinesGroupByLabel[timelineItem.label.name] = [timelineItem]
+  timeline.forEach(timelineItem => {
+    const key = attrCallback(timelineItem)
+    if (!timelinesGroup[key]) {
+      timelinesGroup[key] = [timelineItem]
     } else {
-      timelinesGroupByLabel[timelineItem.label.name].push(timelineItem)
+      timelinesGroup[key].push(timelineItem)
     }
   })
 
-  return Object.keys(timelinesGroupByLabel).map(labelName => {
-    let durationMinute = 0
+  return timelinesGroup
+}
 
+const getDuration = (timeline, endKey) => {
+  let durationMinute = 0
+
+  timeline.forEach((timelineItem, index) => {
+    if (timelineItem.event === endKey) {
+      durationMinute += dayjs(timelineItem.created_at).diff(timeline[index - 1].created_at, 'minute')
+    }
+  })
+
+  return durationMinute
+}
+
+const getLabeledDurations = (timeline, labels) => {
+  const labeledTimelineItems = timeline.filter(item => ['labeled', 'unlabeled'].includes(item.event) && labels.includes(item.label.name))
+  const closedTimelineItem = timeline.filter(item => ['closed'].includes(item.event)).reverse()[0] || null
+  const timelinesGroupByLabel =  timelineGroupByAttribute(labeledTimelineItems, (timeline) => timeline.label.name)
+
+  return Object.keys(timelinesGroupByLabel).map(labelName => {
     const timeline = timelinesGroupByLabel[labelName]
-    timeline.forEach((timelineItem, index) => {
-      if (timelineItem.event === 'unlabeled') {
-        durationMinute += dayjs(timelineItem.created_at).diff(timeline[index - 1].created_at, 'minute')
-      }
-    })
+
+    let durationMinute = getDuration(timeline, 'unlabeled')
 
     const lastTimelineItem = timeline[timeline.length - 1]
     if (lastTimelineItem.event === 'labeled' && closedTimelineItem) {
@@ -6207,8 +6221,31 @@ const getDurations = (timeline) => {
   }).filter(obj => obj.durationMinute > 0)
 }
 
-const getIssueBody = (timeline) => {
-  const durations = getDurations(timeline)
+const getProjectStateDuration = (timeline, columns) => {
+  const projectTimelineItems = timeline.filter(item => ['added_to_project', 'moved_columns_in_project'].includes(item.event) && columns.includes(item.project_card.column_name))
+  const durations = {}
+
+  projectTimelineItems.forEach((timelineItem, index) => {
+    if (index > projectTimelineItems.length - 2) return
+    const columnName = timelineItem.project_card.column_name
+
+    if (durations[columnName] === undefined) durations[columnName] = 0
+
+    durations[columnName] += dayjs(projectTimelineItems[index + 1].created_at).diff(timelineItem.created_at, 'minute')
+  })
+
+  return Object.keys(durations).map(columnName => {
+    return {
+      columnName,
+      durationMinute: durations[columnName]
+    }
+  })
+}
+
+const getLabeledIssueBody = (timeline, labels) => {
+  const durations = getLabeledDurations(timeline, labels)
+  if (durations.length === 0) return ''
+
   const lines = []
 
   lines.push('|label|duration(min)|')
@@ -6220,9 +6257,26 @@ const getIssueBody = (timeline) => {
   return lines.reduce((acc, val) => acc + `${val}\n`, '')
 }
 
+const getProjectStateIssueBody = (timeline, columns) => {
+  const durations = getProjectStateDuration(timeline, columns)
+  if (durations.length === 0) return ''
+
+  const lines = []
+
+  lines.push('|project column|duration(min)|')
+  lines.push('| --- | --- |')
+  durations.forEach(duration => {
+    lines.push(`|${duration.columnName}|${duration.durationMinute}|`)
+  })
+
+  return lines.reduce((acc, val) => acc + `${val}\n`, '')
+}
+
 module.exports = {
-  getDurations,
-  getIssueBody
+  getLabeledDurations,
+  getProjectStateDuration,
+  getLabeledIssueBody,
+  getProjectStateIssueBody
 }
 
 
@@ -6386,20 +6440,31 @@ const core = __nccwpck_require__(186);
 const labeledTimes = __nccwpck_require__(343)
 
 async function run() {
-  const token = core.getInput('access-token');
-
+  const token = core.getInput('access-token')
   const octokit = github.getOctokit(token)
 
-  const timelineResponse = await octokit.rest.issues.listEventsForTimeline({
+  const labelsParam = core.getInput('labels')
+  const projectColumnsParam = core.getInput('project_columns')
+  const labels = labelsParam ? labelsParam.split(',') : []
+  const projectColumns = projectColumnsParam ? projectColumnsParam.split(',') : []
+
+  await octokit.request('GET /repos/{owner}/{repo}/issues/{issue_number}/timeline', {
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
-    issue_number: github.context.issue.number
-  });
+    issue_number: github.context.issue.number,
+    mediaType: {
+      previews: [
+        'mockingbird',
+        'starfox-preview'
+      ]
+    }
+  })
   const timeline = timelineResponse.data
 
-  console.log(timeline)
-
-  const body = labeledTimes.getIssueBody(timeline)
+  const body = `
+${labeledTimes.getLabeledIssueBody(timeline)}\n
+${labeledTimes.getProjectStateIssueBody(timeline)}\n
+`
 
   await octokit.rest.issues.createComment({
     owner: github.context.repo.owner,
