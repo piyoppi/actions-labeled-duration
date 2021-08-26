@@ -25,8 +25,8 @@ async function run() {
   const timeline = timelineResponse.data
 
   const body = `
-${labeledTimes.getLabeledIssueBody(timeline)}\n
-${labeledTimes.getProjectStateIssueBody(timeline)}\n
+${labeledTimes.getLabeledIssueBody(timeline, labels)}\n
+${labeledTimes.getProjectStateIssueBody(timeline, projectColumns)}\n
 `
 
   await octokit.rest.issues.createComment({
