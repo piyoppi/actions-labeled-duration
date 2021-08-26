@@ -15,3 +15,4 @@ jobs:
         uses: ./
         with:
           access-token: ${{ secrets.GITHUB_TOKEN }}
+          labels: label1,label2,ラベルA

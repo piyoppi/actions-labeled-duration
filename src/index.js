@@ -3,20 +3,31 @@ const core = require('@actions/core');
 const labeledTimes = require('../src/labeledTimes.js')
 
 async function run() {
-  const token = core.getInput('access-token');
-
+  const token = core.getInput('access-token')
   const octokit = github.getOctokit(token)
 
-  const timelineResponse = await octokit.rest.issues.listEventsForTimeline({
+  const labelsParam = core.getInput('labels')
+  const projectColumnsParam = core.getInput('project_columns')
+  const labels = labelsParam ? labelsParam.split(',') : []
+  const projectColumns = projectColumnsParam ? projectColumnsParam.split(',') : []
+
+  await octokit.request('GET /repos/{owner}/{repo}/issues/{issue_number}/timeline', {
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
-    issue_number: github.context.issue.number
-  });
+    issue_number: github.context.issue.number,
+    mediaType: {
+      previews: [
+        'mockingbird',
+        'starfox-preview'
+      ]
+    }
+  })
   const timeline = timelineResponse.data
 
-  console.log(timeline)
-
-  const body = labeledTimes.getIssueBody(timeline)
+  const body = `
+${labeledTimes.getLabeledIssueBody(timeline)}\n
+${labeledTimes.getProjectStateIssueBody(timeline)}\n
+`
 
   await octokit.rest.issues.createComment({
     owner: github.context.repo.owner,
