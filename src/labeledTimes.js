@@ -29,7 +29,7 @@ const getDuration = (timeline, endKey) => {
 
 const getLabeledDurations = (timeline, labels) => {
   const labeledTimelineItems = timeline.filter(item => ['labeled', 'unlabeled'].includes(item.event) && labels.includes(item.label.name))
-  const closedTimelineItem = timeline.filter(item => ['closed'].includes(item.event))[0] || null
+  const closedTimelineItem = timeline.filter(item => ['closed'].includes(item.event)).reverse()[0] || null
   const timelinesGroupByLabel =  timelineGroupByAttribute(labeledTimelineItems, (timeline) => timeline.label.name)
 
   return Object.keys(timelinesGroupByLabel).map(labelName => {

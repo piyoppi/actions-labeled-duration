@@ -58,13 +58,6 @@ const timeline = [
   }
 ]
 
-const closedTimelineItem = {
-  "id": 100,
-  "url": "https://api.github.com/repos/piyoppi/examples/issues/events/100",
-  "event": "closed",
-  "created_at": "2021-08-25T14:00:00Z"
-}
-
 const projectTimeline = [
   {
     "id": 1,
@@ -124,6 +117,20 @@ const projectTimeline = [
   }
 ]
 
+const closedTimelineItem = {
+  "id": 100,
+  "url": "https://api.github.com/repos/piyoppi/examples/issues/events/100",
+  "event": "closed",
+  "created_at": "2021-08-25T14:00:00Z"
+}
+
+const closedTimelineItem2 = {
+  "id": 101,
+  "url": "https://api.github.com/repos/piyoppi/examples/issues/events/101",
+  "event": "closed",
+  "created_at": "2021-08-25T14:30:00Z"
+}
+
 const labeledTimes = require('../src/labeledTimes.js')
 
 describe('getLabeledDurations', () => {
@@ -143,6 +150,17 @@ describe('getLabeledDurations', () => {
       {
         labelName: 'label2',
         durationMinute: 45
+      }
+    ])
+
+    expect(labeledTimes.getLabeledDurations([...timeline, closedTimelineItem, closedTimelineItem2], ['label1', 'label2'])).toEqual([
+      {
+        labelName: 'label1',
+        durationMinute: 20
+      },
+      {
+        labelName: 'label2',
+        durationMinute:75
       }
     ])
   })
