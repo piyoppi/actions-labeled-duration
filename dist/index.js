@@ -6448,7 +6448,7 @@ async function run() {
   const labels = labelsParam ? labelsParam.split(',') : []
   const projectColumns = projectColumnsParam ? projectColumnsParam.split(',') : []
 
-  await octokit.request('GET /repos/{owner}/{repo}/issues/{issue_number}/timeline', {
+  const timelineResponse = await octokit.request('GET /repos/{owner}/{repo}/issues/{issue_number}/timeline', {
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     issue_number: github.context.issue.number,
