@@ -178,6 +178,17 @@ describe('getProjectStateDuration', () => {
         durationMinute: 10
       }
     ])
+
+    expect(labeledTimes.getProjectStateDuration(projectTimeline.slice(0, 4), ['TODO', 'Doing'])).toEqual([
+      {
+        columnName: 'TODO',
+        durationMinute: 5
+      },
+      {
+        columnName: 'Doing',
+        durationMinute: 5
+      }
+    ])
   })
 })
 
