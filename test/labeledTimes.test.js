@@ -194,7 +194,8 @@ describe('getProjectStateDuration', () => {
 
 describe('getLabeledIssueBody', () => {
   test('Should return issueBody', () => {
-    expect(labeledTimes.getLabeledIssueBody([...timeline, closedTimelineItem], ['label1', 'label2'])).toEqual(
+    const durations = labeledTimes.getLabeledDurations([...timeline, closedTimelineItem], ['label1', 'label2'])
+    expect(labeledTimes.getLabeledIssueBody(durations)).toEqual(
   `|label|duration(min)|
 | --- | --- |
 |label1|20|
@@ -202,13 +203,14 @@ describe('getLabeledIssueBody', () => {
 `
     )
 
-    expect(labeledTimes.getLabeledIssueBody(timeline, [])).toEqual('')
+    expect(labeledTimes.getLabeledIssueBody([])).toEqual('')
   })
 })
 
-describe('getLabeledIssueBody', () => {
+describe('getProjectStateIssueBody', () => {
   test('Should return issueBody', () => {
-    expect(labeledTimes.getProjectStateIssueBody(projectTimeline, ['TODO', 'Doing'])).toEqual(
+    const durations = labeledTimes.getProjectStateDuration(projectTimeline, ['TODO', 'Doing'])
+    expect(labeledTimes.getProjectStateIssueBody(durations)).toEqual(
   `|project column|duration(min)|
 | --- | --- |
 |TODO|5|
@@ -216,6 +218,6 @@ describe('getLabeledIssueBody', () => {
 `
     )
 
-    expect(labeledTimes.getProjectStateIssueBody(projectTimeline, [])).toEqual('')
+    expect(labeledTimes.getProjectStateIssueBody([])).toEqual('')
   })
 })

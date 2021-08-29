@@ -11,6 +11,17 @@ async function run() {
   const labels = labelsParam ? labelsParam.split(',') : []
   const projectColumns = projectColumnsParam ? projectColumnsParam.split(',') : []
 
+  const issueDetails = await octokit.request('GET /repos/{owner}/{repo}/issues/{issue_number}', {
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    issue_number: github.context.issue.number
+  })
+
+  if (!issueDetails.closed_at) {
+    core.setFailed('The issue is still not closed')
+    return
+  }
+
   const timelineResponse = await octokit.request('GET /repos/{owner}/{repo}/issues/{issue_number}/timeline', {
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
@@ -24,9 +35,12 @@ async function run() {
   })
   const timeline = timelineResponse.data
 
+  const labeledDurations = labeledTimes.getLabeledDurations(timeline, labels)
+  const projectStateDurations = labeledTimes.getProjectStateDuration(timeline, labels)
+
   const body = `
-${labeledTimes.getLabeledIssueBody(timeline, labels)}\n
-${labeledTimes.getProjectStateIssueBody(timeline, projectColumns)}\n
+${labeledTimes.getLabeledIssueBody(labeledDurations)}\n
+${labeledTimes.getProjectStateIssueBody(projectStateDurations)}\n
 `
 
   await octokit.rest.issues.createComment({
@@ -35,6 +49,14 @@ ${labeledTimes.getProjectStateIssueBody(timeline, projectColumns)}\n
     issue_number: github.context.issue.number,
     body
   });
+
+  core.setOutput("labeled_duration_details", JSON.stringify({
+    issue_number: github.context.issue.number,
+    issue_created_at: issueDetails.created_at,
+    issue_closed_at: issueDetails.closed_at,
+    labeledDurations,
+    projectStateDurations
+  }));
 }
 
 run();

@@ -72,8 +72,7 @@ const getProjectStateDuration = (timeline, columns) => {
   })
 }
 
-const getLabeledIssueBody = (timeline, labels) => {
-  const durations = getLabeledDurations(timeline, labels)
+const getLabeledIssueBody = (durations) => {
   if (durations.length === 0) return ''
 
   const lines = []
@@ -87,8 +86,7 @@ const getLabeledIssueBody = (timeline, labels) => {
   return lines.reduce((acc, val) => acc + `${val}\n`, '')
 }
 
-const getProjectStateIssueBody = (timeline, columns) => {
-  const durations = getProjectStateDuration(timeline, columns)
+const getProjectStateIssueBody = (durations) => {
   if (durations.length === 0) return ''
 
   const lines = []

@@ -12,8 +12,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Report
+        id: report
         uses: ./
         with:
           access-token: ${{ secrets.GITHUB_TOKEN }}
           labels: label1,label2,ラベルA
           project_columns: TODO,Doing
+      - name: echo
+        shell: bash
+        run: echo ${{ steps.report.outputs.labeled_duration_details }}
