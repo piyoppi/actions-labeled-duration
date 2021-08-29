@@ -11,11 +11,12 @@ async function run() {
   const labels = labelsParam ? labelsParam.split(',') : []
   const projectColumns = projectColumnsParam ? projectColumnsParam.split(',') : []
 
-  const issueDetails = await octokit.request('GET /repos/{owner}/{repo}/issues/{issue_number}', {
+  const issueDetailsResponse = await octokit.request('GET /repos/{owner}/{repo}/issues/{issue_number}', {
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     issue_number: github.context.issue.number
   })
+  const issueDetails = issueDetailsResponse.data
 
   if (!issueDetails.closed_at) {
     core.setFailed('The issue is still not closed')
