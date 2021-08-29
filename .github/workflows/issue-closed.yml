@@ -20,4 +20,4 @@ jobs:
           project_columns: TODO,Doing
       - name: echo
         shell: bash
-        run: echo ${{ steps.report.outputs.labeled_duration_details }}
+        run: echo "${{ steps.report.outputs.labeled_duration_details }}"
