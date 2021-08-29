@@ -20,4 +20,26 @@ jobs:
           project_columns: TODO,Doing
       - name: echo
         shell: bash
-        run: echo "${{ steps.report.outputs.labeled_duration_details }}"
+        env:
+          OUTPUTTED_CONTENT: ${{ steps.report.outputs.labeled_duration_details }}
+        run: printf %q $OUTPUTTED_CONTENT
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: issue_tracked
+      - name: write
+        shell: bash
+        env:
+          OUTPUTTED_CONTENT: ${{ steps.report.outputs.labeled_duration_details }}
+        run: |
+          git config --global user.email "bot@garakuta-toolbox.com"
+          git config --global user.name "piyoppi-bot"
+          branch='issue_tracked'
+          dir='./issue_tracked'
+          if [ ! -d $dir ]; then
+            mkdir $dir
+          fi
+          echo $OUTPUTTED_CONTENT > "$dir/${{ github.event.issue.number }}.json"
+          git add .
+          git commit -m "add / replace ${{ github.event.issue.number }}.json"
+          git push origin $branch
