@@ -18,6 +18,7 @@ jobs:
           access-token: ${{ secrets.GITHUB_TOKEN }}
           labels: label1,label2,ラベルA
           project_columns: TODO,Doing
+          issue_comment: '⌛このIssueの作業にかかった時間は以下の通りです'
       - name: echo
         shell: bash
         env:

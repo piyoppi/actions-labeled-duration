@@ -6447,6 +6447,7 @@ async function run() {
 
   const labelsParam = core.getInput('labels')
   const projectColumnsParam = core.getInput('project_columns')
+  const additionalIssueComment = core.getInput('issue_comment') || ''
   const labels = labelsParam ? labelsParam.split(',') : []
   const projectColumns = projectColumnsParam ? projectColumnsParam.split(',') : []
 
@@ -6479,6 +6480,7 @@ async function run() {
   const projectStateDurations = labeledTimes.getProjectStateDuration(timeline, projectColumns)
 
   const body = `
+${additionalIssueComment}\n
 ${labeledTimes.getLabeledIssueBody(labeledDurations)}\n
 ${labeledTimes.getProjectStateIssueBody(projectStateDurations)}\n
 `

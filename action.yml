@@ -10,6 +10,9 @@ inputs:
   project_columns:
     description: 'Tracking project columns(splitted comma)'
     required: false
+  issue_comment:
+    description: 'Additional issue comment'
+    required: false
 outputs:
   labeled_duration_details:
     description: 'Duration of labeling (JSON format)'
