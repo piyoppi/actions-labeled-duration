@@ -6215,7 +6215,7 @@ const getLabeledDurations = (timeline, labels) => {
     }
 
     return {
-      labelName,
+      name: labelName,
       durationMinute
     }
   }).filter(obj => obj.durationMinute > 0)
@@ -6238,38 +6238,40 @@ const getProjectStateDuration = (timeline, columns) => {
 
   return Object.keys(durations).map(columnName => {
     return {
-      columnName,
+      name: columnName,
       durationMinute: durations[columnName]
     }
   })
 }
 
-const getLabeledIssueBody = (durations) => {
-  if (durations.length === 0) return ''
-
+const getMarkdownTable = (columnNames, columns) => {
   const lines = []
 
-  lines.push('|label|duration(min)|')
-  lines.push('| --- | --- |')
-  durations.forEach(duration => {
-    lines.push(`|${duration.labelName}|${duration.durationMinute}|`)
+  lines.push(columnNames.reduce((acc, val) => `${acc}|${val}`, '') + '|')
+  lines.push(columnNames.reduce((acc) => `${acc}| --- `, '') + '|')
+  columns.forEach(column => {
+    lines.push(column.reduce((acc, val) => `${acc}|${val}`, '') + '|')
   })
 
   return lines.reduce((acc, val) => acc + `${val}\n`, '')
 }
 
+const getLabeledIssueBody = (durations) => {
+  if (durations.length === 0) return ''
+
+  const columnNames = ['label', 'duration(min)']
+  const columns = durations.map(duration => [duration.name, duration.durationMinute])
+
+  return getMarkdownTable(columnNames, columns)
+}
+
 const getProjectStateIssueBody = (durations) => {
   if (durations.length === 0) return ''
 
-  const lines = []
+  const columnNames = ['project column', 'duration(min)']
+  const columns = durations.map(duration => [duration.name, duration.durationMinute])
 
-  lines.push('|project column|duration(min)|')
-  lines.push('| --- | --- |')
-  durations.forEach(duration => {
-    lines.push(`|${duration.columnName}|${duration.durationMinute}|`)
-  })
-
-  return lines.reduce((acc, val) => acc + `${val}\n`, '')
+  return getMarkdownTable(columnNames, columns)
 }
 
 module.exports = {
@@ -6489,9 +6491,9 @@ ${labeledTimes.getProjectStateIssueBody(projectStateDurations)}\n
   });
 
   core.setOutput("labeled_duration_details", JSON.stringify({
-    issue_number: github.context.issue.number,
-    issue_created_at: issueDetails.created_at,
-    issue_closed_at: issueDetails.closed_at,
+    issueNumber: github.context.issue.number,
+    issueCreatedAt: issueDetails.created_at,
+    issueClosedAt: issueDetails.closed_at,
     labeledDurations,
     projectStateDurations
   }));

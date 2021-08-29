@@ -137,29 +137,29 @@ describe('getLabeledDurations', () => {
   test('Should return labeled times', () => {
     expect(labeledTimes.getLabeledDurations(timeline, ['label1', 'label2'])).toEqual([
       {
-        labelName: 'label1',
+        name: 'label1',
         durationMinute: 20
       }
     ])
 
     expect(labeledTimes.getLabeledDurations([...timeline, closedTimelineItem], ['label1', 'label2'])).toEqual([
       {
-        labelName: 'label1',
+        name: 'label1',
         durationMinute: 20
       },
       {
-        labelName: 'label2',
+        name: 'label2',
         durationMinute: 45
       }
     ])
 
     expect(labeledTimes.getLabeledDurations([...timeline, closedTimelineItem, closedTimelineItem2], ['label1', 'label2'])).toEqual([
       {
-        labelName: 'label1',
+        name: 'label1',
         durationMinute: 20
       },
       {
-        labelName: 'label2',
+        name: 'label2',
         durationMinute:75
       }
     ])
@@ -170,22 +170,22 @@ describe('getProjectStateDuration', () => {
   test('Should return project state duration', () => {
     expect(labeledTimes.getProjectStateDuration(projectTimeline, ['TODO', 'Doing'])).toEqual([
       {
-        columnName: 'TODO',
+        name: 'TODO',
         durationMinute: 5
       },
       {
-        columnName: 'Doing',
+        name: 'Doing',
         durationMinute: 10
       }
     ])
 
     expect(labeledTimes.getProjectStateDuration(projectTimeline.slice(0, 4), ['TODO', 'Doing'])).toEqual([
       {
-        columnName: 'TODO',
+        name: 'TODO',
         durationMinute: 5
       },
       {
-        columnName: 'Doing',
+        name: 'Doing',
         durationMinute: 5
       }
     ])
