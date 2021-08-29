@@ -6474,7 +6474,7 @@ async function run() {
   const timeline = timelineResponse.data
 
   const labeledDurations = labeledTimes.getLabeledDurations(timeline, labels)
-  const projectStateDurations = labeledTimes.getProjectStateDuration(timeline, labels)
+  const projectStateDurations = labeledTimes.getProjectStateDuration(timeline, projectColumns)
 
   const body = `
 ${labeledTimes.getLabeledIssueBody(labeledDurations)}\n
