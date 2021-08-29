@@ -6491,9 +6491,13 @@ ${labeledTimes.getProjectStateIssueBody(projectStateDurations)}\n
   });
 
   core.setOutput("labeled_duration_details", JSON.stringify({
-    issueNumber: github.context.issue.number,
-    issueCreatedAt: issueDetails.created_at,
-    issueClosedAt: issueDetails.closed_at,
+    issue: {
+      number: github.context.issue.number,
+      title: issueDetails.title,
+      labels: issueDetails.labels.map(label => label.name),
+      createdAt: issueDetails.created_at,
+      closedAt: issueDetails.closed_at,
+    },
     labeledDurations,
     projectStateDurations
   }));
