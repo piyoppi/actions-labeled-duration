@@ -6445,16 +6445,20 @@ async function run() {
   const token = core.getInput('access-token')
   const octokit = github.getOctokit(token)
 
+  const owner = core.getInput('repository_owner') || github.context.repo.owner
+  const repo = core.getInput('repository_name') || github.context.repo.repo
+  const issueNumber = core.getInput('issue_number') || github.context.issue.number
+
   const labelsParam = core.getInput('labels')
   const projectColumnsParam = core.getInput('project_columns')
   const additionalIssueComment = core.getInput('issue_comment') || ''
   const labels = labelsParam ? labelsParam.split(',') : []
   const projectColumns = projectColumnsParam ? projectColumnsParam.split(',') : []
 
-  const issueDetailsResponse = await octokit.request('GET /repos/{owner}/{repo}/issues/{issue_number}', {
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-    issue_number: github.context.issue.number
+  const issueDetailsResponse = await octokit.request('GET /repos/{owner}/{repo}/issues/{issueNumber}', {
+    owner,
+    repo,
+    issueNumber
   })
   const issueDetails = issueDetailsResponse.data
 
@@ -6463,10 +6467,10 @@ async function run() {
     return
   }
 
-  const timelineResponse = await octokit.request('GET /repos/{owner}/{repo}/issues/{issue_number}/timeline', {
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-    issue_number: github.context.issue.number,
+  const timelineResponse = await octokit.request('GET /repos/{owner}/{repo}/issues/{issueNumber}/timeline', {
+    owner,
+    repo,
+    issueNumber,
     mediaType: {
       previews: [
         'mockingbird',
@@ -6486,9 +6490,9 @@ ${labeledTimes.getProjectStateIssueBody(projectStateDurations)}\n
 `
 
   await octokit.rest.issues.createComment({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-    issue_number: github.context.issue.number,
+    owner,
+    repo,
+    issue_number: issueNumber,
     body
   });
 

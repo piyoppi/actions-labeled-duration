@@ -13,9 +13,6 @@ npm run build
 ```yml
 - uses: ./
   with:
-    # Access token for read / write issues
-    access-token: ${{ secrets.GITHUB_TOKEN }}
-
     # Tracking labels (Splitted comma)
     labels: label1,label2
 
