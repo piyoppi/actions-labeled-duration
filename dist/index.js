@@ -6496,6 +6496,11 @@ ${labeledTimes.getProjectStateIssueBody(projectStateDurations)}\n
     body
   });
 
+  const convertDurationFunc = (acc, val) => {
+    acc[val.name] = val
+    return acc
+  }
+
   core.setOutput("labeled_duration_details", JSON.stringify({
     issue: {
       number: github.context.issue.number,
@@ -6504,8 +6509,8 @@ ${labeledTimes.getProjectStateIssueBody(projectStateDurations)}\n
       createdAt: issueDetails.created_at,
       closedAt: issueDetails.closed_at,
     },
-    labeledDurations,
-    projectStateDurations
+    labeledDurations: labeledDurations.reduce(convertDurationFunc, {}),
+    projectStateDurations: projectStateDurations.reduce(convertDurationFunc, {})
   }));
 }
 
