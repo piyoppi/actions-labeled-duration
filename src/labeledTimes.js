@@ -1,4 +1,6 @@
 const dayjs = require('dayjs')
+const duration = require('dayjs/plugin/duration')
+dayjs.extend(duration)
 
 const timelineGroupByAttribute = (timeline, attrCallback) => {
   const timelinesGroup = {}
@@ -42,9 +44,12 @@ const getLabeledDurations = (timeline, labels) => {
       durationMinute += dayjs(closedTimelineItem.created_at).diff(lastTimelineItem.created_at, 'minute')
     }
 
+    const duration = dayjs.duration(durationMinute, 'minutes')
+
     return {
       name: labelName,
-      durationMinute
+      durationMinute,
+      durationDisplayed: `${Math.floor(duration.asHours())} h ${duration.minutes()} min (${duration.days()} day)`
     }
   }).filter(obj => obj.durationMinute > 0)
 }
@@ -64,10 +69,14 @@ const getProjectStateDuration = (timeline, columns) => {
     durations[columnName] += dayjs(projectTimelineItems[index + 1].created_at).diff(timelineItem.created_at, 'minute')
   })
 
+
   return Object.keys(durations).map(columnName => {
+    const duration = dayjs.duration(durations[columnName], 'minutes')
+
     return {
       name: columnName,
-      durationMinute: durations[columnName]
+      durationMinute: durations[columnName],
+      durationDisplayed: `${Math.floor(duration.asHours())} h ${duration.minutes()} min (${duration.days()} day)`
     }
   })
 }
@@ -87,8 +96,8 @@ const getMarkdownTable = (columnNames, columns) => {
 const getLabeledIssueBody = (durations) => {
   if (durations.length === 0) return ''
 
-  const columnNames = ['label', 'duration(min)']
-  const columns = durations.map(duration => [duration.name, duration.durationMinute])
+  const columnNames = ['label', 'duration(min)', 'duration (hours / minutes / days)']
+  const columns = durations.map(duration => [duration.name, duration.durationMinute, duration.durationDisplayed])
 
   return getMarkdownTable(columnNames, columns)
 }
@@ -96,8 +105,8 @@ const getLabeledIssueBody = (durations) => {
 const getProjectStateIssueBody = (durations) => {
   if (durations.length === 0) return ''
 
-  const columnNames = ['project column', 'duration(min)']
-  const columns = durations.map(duration => [duration.name, duration.durationMinute])
+  const columnNames = ['project column', 'duration(min)', 'duration (hours / minutes / days)']
+  const columns = durations.map(duration => [duration.name, duration.durationMinute, duration.durationDisplayed])
 
   return getMarkdownTable(columnNames, columns)
 }

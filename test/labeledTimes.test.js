@@ -197,29 +197,34 @@ describe('getLabeledDurations', () => {
     expect(labeledTimes.getLabeledDurations(timeline, ['label1', 'label2'])).toEqual([
       {
         name: 'label1',
-        durationMinute: 20
+        durationMinute: 20,
+        durationDisplayed: '0 h 20 min (0 day)'
       }
     ])
 
     expect(labeledTimes.getLabeledDurations([...timeline, closedTimelineItem], ['label1', 'label2'])).toEqual([
       {
         name: 'label1',
-        durationMinute: 20
+        durationMinute: 20,
+        durationDisplayed: '0 h 20 min (0 day)'
       },
       {
         name: 'label2',
-        durationMinute: 45
+        durationMinute: 45,
+        durationDisplayed: '0 h 45 min (0 day)'
       }
     ])
 
     expect(labeledTimes.getLabeledDurations([...timeline, closedTimelineItem, closedTimelineItem2], ['label1', 'label2'])).toEqual([
       {
         name: 'label1',
-        durationMinute: 20
+        durationMinute: 20,
+        durationDisplayed: '0 h 20 min (0 day)'
       },
       {
         name: 'label2',
-        durationMinute:75
+        durationMinute:75,
+        durationDisplayed: '1 h 15 min (0 day)'
       }
     ])
   })
@@ -230,33 +235,39 @@ describe('getProjectStateDuration', () => {
     expect(labeledTimes.getProjectStateDuration(projectTimeline, ['TODO', 'Doing'])).toEqual([
       {
         name: 'TODO',
-        durationMinute: 5
+        durationMinute: 5,
+        durationDisplayed: '0 h 5 min (0 day)'
       },
       {
         name: 'Doing',
-        durationMinute: 10
+        durationMinute: 10,
+        durationDisplayed: '0 h 10 min (0 day)'
       }
     ])
 
     expect(labeledTimes.getProjectStateDuration(convertProjectCardToIssueTimeline, ['TODO', 'Doing'])).toEqual([
       {
         name: 'TODO',
-        durationMinute: 5
+        durationMinute: 5,
+        durationDisplayed: '0 h 5 min (0 day)'
       },
       {
         name: 'Doing',
-        durationMinute: 10
+        durationMinute: 10,
+        durationDisplayed: '0 h 10 min (0 day)'
       }
     ])
 
     expect(labeledTimes.getProjectStateDuration(projectTimeline.slice(0, 4), ['TODO', 'Doing'])).toEqual([
       {
         name: 'TODO',
-        durationMinute: 5
+        durationMinute: 5,
+        durationDisplayed: '0 h 5 min (0 day)'
       },
       {
         name: 'Doing',
-        durationMinute: 5
+        durationMinute: 5,
+        durationDisplayed: '0 h 5 min (0 day)'
       }
     ])
   })
@@ -266,10 +277,10 @@ describe('getLabeledIssueBody', () => {
   test('Should return issueBody', () => {
     const durations = labeledTimes.getLabeledDurations([...timeline, closedTimelineItem], ['label1', 'label2'])
     expect(labeledTimes.getLabeledIssueBody(durations)).toEqual(
-  `|label|duration(min)|
-| --- | --- |
-|label1|20|
-|label2|45|
+  `|label|duration(min)|duration (hours / minutes / days)|
+| --- | --- | --- |
+|label1|20|0 h 20 min (0 day)|
+|label2|45|0 h 45 min (0 day)|
 `
     )
 
@@ -281,10 +292,10 @@ describe('getProjectStateIssueBody', () => {
   test('Should return issueBody', () => {
     const durations = labeledTimes.getProjectStateDuration(projectTimeline, ['TODO', 'Doing'])
     expect(labeledTimes.getProjectStateIssueBody(durations)).toEqual(
-  `|project column|duration(min)|
-| --- | --- |
-|TODO|5|
-|Doing|10|
+  `|project column|duration(min)|duration (hours / minutes / days)|
+| --- | --- | --- |
+|TODO|5|0 h 5 min (0 day)|
+|Doing|10|0 h 10 min (0 day)|
 `
     )
 
