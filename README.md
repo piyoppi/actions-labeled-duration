@@ -1,6 +1,8 @@
 # actions-labeled-duration
 
-Issueのラベルを使って時間を計測するGitHub Actionsのサンプル
+Calculate the labeled duration and comment on the GitHub Issue.
+
+![summary](./images/README_summary.png)
 
 ## Build
 
@@ -21,6 +23,9 @@ npm run build
 
     # Additional issue comment
     issue_comment: 'The time taken to close this Issue is as follows.'
+
+    # Target issue number(default: current issue number)
+    issue_number: 1
 ```
 
 ## Outputs
@@ -34,25 +39,28 @@ Details about the time it took to solve the issue (JSON string).
   "issue": {
     "number": 1,
     "title": "Issue title",
-    "labels": [],
+    "labels": ["label1"],
     "createdAt": "2021-08-26T14:38:16Z",
     "closedAt": "2021-08-29T14:05:46Z"
   },
-  "labeledDurations": [
-    {
+  "labeledDurations": {
+    "label1": {
       "name": "label1",
-      "durationMinute": 10
+      "durationMinute": 10,
+      "durationDisplayed": "0 h 10 min (0 day)"
     }
-  ],
-  "projectStateDurations": [
-    {
+  },
+  "projectStateDurations": {
+    "TODO": {
       "name": "TODO",
-      "durationMinute": 210
+      "durationMinute": 210,
+      "durationDisplayed": "3 h 30 min (0 day)"
     },
-    {
+    "Doing": {
       "name": "Doing",
-      "durationMinute": 35
+      "durationMinute": 35,
+      "durationDisplayed": "0 h 35 min (0 day)"
     }
-  ]
+  }
 }
 ```
