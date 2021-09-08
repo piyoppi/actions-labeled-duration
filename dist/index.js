@@ -6222,7 +6222,7 @@ const getLabeledDurations = (timeline, labels) => {
 }
 
 const getProjectStateDuration = (timeline, columns) => {
-  const projectTimelineItems = timeline.filter(item => ['added_to_project', 'moved_columns_in_project'].includes(item.event))
+  const projectTimelineItems = timeline.filter(item => ['converted_note_to_issue', 'added_to_project', 'moved_columns_in_project'].includes(item.event))
   const durations = {}
 
   projectTimelineItems.forEach((timelineItem, index) => {

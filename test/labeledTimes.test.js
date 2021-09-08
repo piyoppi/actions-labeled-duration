@@ -117,6 +117,65 @@ const projectTimeline = [
   }
 ]
 
+const convertProjectCardToIssueTimeline = [
+  {
+    "id": 1,
+    "event": "converted_note_to_issue",
+    "created_at": "2021-08-25T13:00:00Z",
+    "project_card": {
+      "column_name": "TODO"
+    },
+  },
+  {
+    "id": 2,
+    "event": "labeled",
+    "created_at": "2021-08-25T13:01:00Z",
+    "label": {
+      "name": "label1"
+    },
+  },
+  {
+    "id": 3,
+    "event": "moved_columns_in_project",
+    "created_at": "2021-08-25T13:05:00Z",
+    "project_card": {
+      "column_name": "Doing"
+    },
+  },
+  {
+    "id": 4,
+    "event": "moved_columns_in_project",
+    "created_at": "2021-08-25T13:10:00Z",
+    "project_card": {
+      "column_name": "Done"
+    },
+  },
+  {
+    "id": 5,
+    "event": "moved_columns_in_project",
+    "created_at": "2021-08-25T13:15:00Z",
+    "project_card": {
+      "column_name": "Doing"
+    },
+  },
+  {
+    "id": 6,
+    "event": "labeled",
+    "created_at": "2021-08-25T13:16:00Z",
+    "label": {
+      "name": "label1"
+    },
+  },
+  {
+    "id": 7,
+    "event": "moved_columns_in_project",
+    "created_at": "2021-08-25T13:20:00Z",
+    "project_card": {
+      "column_name": "Done"
+    },
+  }
+]
+
 const closedTimelineItem = {
   "id": 100,
   "url": "https://api.github.com/repos/piyoppi/examples/issues/events/100",
@@ -169,6 +228,17 @@ describe('getLabeledDurations', () => {
 describe('getProjectStateDuration', () => {
   test('Should return project state duration', () => {
     expect(labeledTimes.getProjectStateDuration(projectTimeline, ['TODO', 'Doing'])).toEqual([
+      {
+        name: 'TODO',
+        durationMinute: 5
+      },
+      {
+        name: 'Doing',
+        durationMinute: 10
+      }
+    ])
+
+    expect(labeledTimes.getProjectStateDuration(convertProjectCardToIssueTimeline, ['TODO', 'Doing'])).toEqual([
       {
         name: 'TODO',
         durationMinute: 5
