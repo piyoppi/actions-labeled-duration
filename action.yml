@@ -12,7 +12,7 @@ inputs:
     description: 'Target repository name (default: current repository)'
     required: false
   issue_number:
-    description: 'Target repository name (default: current issue number)'
+    description: 'Target issue number(default: current issue number)'
     required: false
   labels:
     description: 'Tracking labels (splitted comma)'
