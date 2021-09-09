@@ -29,8 +29,7 @@ async function run() {
     return
   }
 
-  const timelineResponse = await getTimeline(octokit, owner, repo, issueNumber, 10)
-  const timeline = timelineResponse.data
+  const timeline = await getTimeline(octokit, owner, repo, issueNumber, 10)
 
   const labeledDurations = labeledTimes.getLabeledDurations(timeline, labels)
   const projectStateDurations = labeledTimes.getProjectStateDuration(timeline, projectColumns)

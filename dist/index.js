@@ -6193,9 +6193,9 @@ module.exports = async (octokit, owner, repo, issueNumber, limit) => {
         ]
       }
     })
-    if (timelineResponse.length === 0) break
+    if (!timelineResponse.data || timelineResponse.data.length === 0) break
 
-    responses.push(timelineResponse)
+    responses.push(timelineResponse.data)
   }
 
   return responses.flat()
@@ -6514,8 +6514,7 @@ async function run() {
     return
   }
 
-  const timelineResponse = await getTimeline(octokit, owner, repo, issueNumber, 10)
-  const timeline = timelineResponse.data
+  const timeline = await getTimeline(octokit, owner, repo, issueNumber, 10)
 
   const labeledDurations = labeledTimes.getLabeledDurations(timeline, labels)
   const projectStateDurations = labeledTimes.getProjectStateDuration(timeline, projectColumns)
