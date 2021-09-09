@@ -6243,7 +6243,9 @@ const getLabeledDurations = (timeline, labels) => {
   const closedTimelineItem = timeline.filter(item => ['closed'].includes(item.event)).reverse()[0] || null
   const timelinesGroupByLabel =  timelineGroupByAttribute(labeledTimelineItems, (timeline) => timeline.label.name)
 
-  return Object.keys(timelinesGroupByLabel).map(labelName => {
+  const labelsList = labels.map(label => ({name: label, durationMinute: 0, durationDisplayed: '0 h 0 min (0 day)'}))
+
+  Object.keys(timelinesGroupByLabel).forEach(labelName => {
     const timeline = timelinesGroupByLabel[labelName]
 
     let durationMinute = getDuration(timeline, 'unlabeled')
@@ -6255,12 +6257,17 @@ const getLabeledDurations = (timeline, labels) => {
 
     const duration = dayjs.duration(durationMinute, 'minutes')
 
-    return {
-      name: labelName,
-      durationMinute,
-      durationDisplayed: `${Math.floor(duration.asHours())} h ${duration.minutes()} min (${duration.days()} day)`
+    const labelIndex = labelsList.findIndex(label => label.name === labelName)
+    if (labelIndex >= 0) {
+      labelsList[labelIndex] = {
+        name: labelName,
+        durationMinute,
+        durationDisplayed: `${Math.floor(duration.asHours())} h ${duration.minutes()} min (${duration.days()} day)`
+      }
     }
-  }).filter(obj => obj.durationMinute > 0)
+  })
+
+  return labelsList
 }
 
 const getProjectStateDuration = (timeline, columns) => {
@@ -6278,16 +6285,22 @@ const getProjectStateDuration = (timeline, columns) => {
     durations[columnName] += dayjs(projectTimelineItems[index + 1].created_at).diff(timelineItem.created_at, 'minute')
   })
 
+  const columnsList = columns.map(column => ({name: column, durationMinute: 0, durationDisplayed: '0 h 0 min (0 day)'}))
 
-  return Object.keys(durations).map(columnName => {
+  Object.keys(durations).map(columnName => {
     const duration = dayjs.duration(durations[columnName], 'minutes')
 
-    return {
-      name: columnName,
-      durationMinute: durations[columnName],
-      durationDisplayed: `${Math.floor(duration.asHours())} h ${duration.minutes()} min (${duration.days()} day)`
+    const columnIndex = columnsList.findIndex(column => column.name === columnName)
+    if (columnIndex >= 0) {
+      columnsList[columnIndex] = {
+        name: columnName,
+        durationMinute: durations[columnName],
+        durationDisplayed: `${Math.floor(duration.asHours())} h ${duration.minutes()} min (${duration.days()} day)`
+      }
     }
   })
+
+  return columnsList
 }
 
 const getMarkdownTable = (columnNames, columns) => {

@@ -194,11 +194,21 @@ const labeledTimes = require('../src/labeledTimes.js')
 
 describe('getLabeledDurations', () => {
   test('Should return labeled times', () => {
-    expect(labeledTimes.getLabeledDurations(timeline, ['label1', 'label2'])).toEqual([
+    expect(labeledTimes.getLabeledDurations(timeline, ['label1', 'label2', 'label3'])).toEqual([
       {
         name: 'label1',
         durationMinute: 20,
         durationDisplayed: '0 h 20 min (0 day)'
+      },
+      {
+        name: 'label2',
+        durationMinute: 0,
+        durationDisplayed: '0 h 0 min (0 day)'
+      },
+      {
+        name: 'label3',
+        durationMinute: 0,
+        durationDisplayed: '0 h 0 min (0 day)'
       }
     ])
 
@@ -232,7 +242,7 @@ describe('getLabeledDurations', () => {
 
 describe('getProjectStateDuration', () => {
   test('Should return project state duration', () => {
-    expect(labeledTimes.getProjectStateDuration(projectTimeline, ['TODO', 'Doing'])).toEqual([
+    expect(labeledTimes.getProjectStateDuration(projectTimeline, ['TODO', 'Doing', 'none'])).toEqual([
       {
         name: 'TODO',
         durationMinute: 5,
@@ -242,6 +252,11 @@ describe('getProjectStateDuration', () => {
         name: 'Doing',
         durationMinute: 10,
         durationDisplayed: '0 h 10 min (0 day)'
+      },
+      {
+        name: 'none',
+        durationMinute: 0,
+        durationDisplayed: '0 h 0 min (0 day)'
       }
     ])
 
@@ -275,12 +290,13 @@ describe('getProjectStateDuration', () => {
 
 describe('getLabeledIssueBody', () => {
   test('Should return issueBody', () => {
-    const durations = labeledTimes.getLabeledDurations([...timeline, closedTimelineItem], ['label1', 'label2'])
+    const durations = labeledTimes.getLabeledDurations([...timeline, closedTimelineItem], ['label1', 'label2', 'none'])
     expect(labeledTimes.getLabeledIssueBody(durations)).toEqual(
   `|label|duration(min)|duration (hours / minutes / days)|
 | --- | --- | --- |
 |label1|20|0 h 20 min (0 day)|
 |label2|45|0 h 45 min (0 day)|
+|none|0|0 h 0 min (0 day)|
 `
     )
 
@@ -290,12 +306,13 @@ describe('getLabeledIssueBody', () => {
 
 describe('getProjectStateIssueBody', () => {
   test('Should return issueBody', () => {
-    const durations = labeledTimes.getProjectStateDuration(projectTimeline, ['TODO', 'Doing'])
+    const durations = labeledTimes.getProjectStateDuration(projectTimeline, ['TODO', 'Doing', 'none'])
     expect(labeledTimes.getProjectStateIssueBody(durations)).toEqual(
   `|project column|duration(min)|duration (hours / minutes / days)|
 | --- | --- | --- |
 |TODO|5|0 h 5 min (0 day)|
 |Doing|10|0 h 10 min (0 day)|
+|none|0|0 h 0 min (0 day)|
 `
     )
 
