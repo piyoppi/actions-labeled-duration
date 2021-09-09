@@ -6174,6 +6174,36 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
+/***/ 372:
+/***/ ((module) => {
+
+module.exports = async (octokit, owner, repo, issueNumber, limit) => {
+  let fetchCount = 0
+  const responses = []
+
+  while(fetchCount++ < limit) {
+    const timelineResponse = await octokit.request(`GET /repos/{owner}/{repo}/issues/{issueNumber}/timeline?page=${fetchCount}`, {
+      owner,
+      repo,
+      issueNumber,
+      mediaType: {
+        previews: [
+          'mockingbird',
+          'starfox-preview'
+        ]
+      }
+    })
+    if (timelineResponse.length === 0) break
+
+    responses.push(timelineResponse)
+  }
+
+  return responses.flat()
+}
+
+
+/***/ }),
+
 /***/ 343:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -6456,6 +6486,7 @@ var __webpack_exports__ = {};
 const github = __nccwpck_require__(438);
 const core = __nccwpck_require__(186);
 const labeledTimes = __nccwpck_require__(343)
+const getTimeline = __nccwpck_require__(372)
 
 async function run() {
   const token = core.getInput('access-token')
@@ -6483,17 +6514,7 @@ async function run() {
     return
   }
 
-  const timelineResponse = await octokit.request('GET /repos/{owner}/{repo}/issues/{issueNumber}/timeline', {
-    owner,
-    repo,
-    issueNumber,
-    mediaType: {
-      previews: [
-        'mockingbird',
-        'starfox-preview'
-      ]
-    }
-  })
+  const timelineResponse = await getTimeline(octokit, owner, repo, issueNumber, 10)
   const timeline = timelineResponse.data
 
   const labeledDurations = labeledTimes.getLabeledDurations(timeline, labels)

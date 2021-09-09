@@ -1,6 +1,7 @@
 const github = require('@actions/github');
 const core = require('@actions/core');
-const labeledTimes = require('../src/labeledTimes.js')
+const labeledTimes = require('./labeledTimes.js')
+const getTimeline = require('./getTimeline.js')
 
 async function run() {
   const token = core.getInput('access-token')
@@ -28,17 +29,7 @@ async function run() {
     return
   }
 
-  const timelineResponse = await octokit.request('GET /repos/{owner}/{repo}/issues/{issueNumber}/timeline', {
-    owner,
-    repo,
-    issueNumber,
-    mediaType: {
-      previews: [
-        'mockingbird',
-        'starfox-preview'
-      ]
-    }
-  })
+  const timelineResponse = await getTimeline(octokit, owner, repo, issueNumber, 10)
   const timeline = timelineResponse.data
 
   const labeledDurations = labeledTimes.getLabeledDurations(timeline, labels)
