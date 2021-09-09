@@ -1,5 +1,7 @@
 # actions-labeled-duration
 
+[![test](https://github.com/piyoppi/actions-labeled-duration/actions/workflows/ci.yml/badge.svg)](https://github.com/piyoppi/actions-labeled-duration/actions/workflows/ci.yml)
+
 Calculate the labeled duration and comment on the GitHub Issue.
 
 ![summary](./images/README_summary.png)
