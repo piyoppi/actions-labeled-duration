@@ -6343,6 +6343,79 @@ module.exports = {
 
 /***/ }),
 
+/***/ 74:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const github = __nccwpck_require__(438);
+const core = __nccwpck_require__(186);
+const labeledTimes = __nccwpck_require__(343)
+const getTimeline = __nccwpck_require__(372)
+
+module.exports = async function() {
+  const token = core.getInput('access-token')
+  const octokit = github.getOctokit(token)
+
+  const owner = core.getInput('repository_owner') || github.context.repo.owner
+  const repo = core.getInput('repository_name') || github.context.repo.repo
+  const issueNumber = core.getInput('issue_number') || github.context.issue.number
+
+  const labelsParam = core.getInput('labels')
+  const projectColumnsParam = core.getInput('project_columns')
+  const additionalIssueComment = core.getInput('issue_comment') || ''
+  const labels = labelsParam ? labelsParam.split(',') : []
+  const projectColumns = projectColumnsParam ? projectColumnsParam.split(',') : []
+
+  const issueDetailsResponse = await octokit.request('GET /repos/{owner}/{repo}/issues/{issueNumber}', {
+    owner,
+    repo,
+    issueNumber
+  })
+  const issueDetails = issueDetailsResponse.data
+
+  if (!issueDetails.closed_at) {
+    core.setFailed('The issue is still not closed')
+    return
+  }
+
+  const timeline = await getTimeline(octokit, owner, repo, issueNumber, 10)
+
+  const labeledDurations = labeledTimes.getLabeledDurations(timeline, labels)
+  const projectStateDurations = labeledTimes.getProjectStateDuration(timeline, projectColumns)
+
+  const body = `
+${additionalIssueComment}\n
+${labeledTimes.getLabeledIssueBody(labeledDurations)}
+${labeledTimes.getProjectStateIssueBody(projectStateDurations)}
+`
+
+  await octokit.rest.issues.createComment({
+    owner,
+    repo,
+    issue_number: issueNumber,
+    body
+  });
+
+  const convertDurationFunc = (acc, val) => {
+    acc[val.name] = val
+    return acc
+  }
+
+  core.setOutput('labeled_duration_details', JSON.stringify({
+    issue: {
+      number: issueNumber,
+      title: issueDetails.title,
+      labels: issueDetails.labels.map(label => label.name),
+      createdAt: issueDetails.created_at,
+      closedAt: issueDetails.closed_at,
+    },
+    labeledDurations: labeledDurations.reduce(convertDurationFunc, {}),
+    projectStateDurations: projectStateDurations.reduce(convertDurationFunc, {})
+  }));
+}
+
+
+/***/ }),
+
 /***/ 877:
 /***/ ((module) => {
 
@@ -6496,74 +6569,9 @@ module.exports = require("zlib");
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
-const github = __nccwpck_require__(438);
-const core = __nccwpck_require__(186);
-const labeledTimes = __nccwpck_require__(343)
-const getTimeline = __nccwpck_require__(372)
+const run = __nccwpck_require__(74)
 
-async function run() {
-  const token = core.getInput('access-token')
-  const octokit = github.getOctokit(token)
-
-  const owner = core.getInput('repository_owner') || github.context.repo.owner
-  const repo = core.getInput('repository_name') || github.context.repo.repo
-  const issueNumber = core.getInput('issue_number') || github.context.issue.number
-
-  const labelsParam = core.getInput('labels')
-  const projectColumnsParam = core.getInput('project_columns')
-  const additionalIssueComment = core.getInput('issue_comment') || ''
-  const labels = labelsParam ? labelsParam.split(',') : []
-  const projectColumns = projectColumnsParam ? projectColumnsParam.split(',') : []
-
-  const issueDetailsResponse = await octokit.request('GET /repos/{owner}/{repo}/issues/{issueNumber}', {
-    owner,
-    repo,
-    issueNumber
-  })
-  const issueDetails = issueDetailsResponse.data
-
-  if (!issueDetails.closed_at) {
-    core.setFailed('The issue is still not closed')
-    return
-  }
-
-  const timeline = await getTimeline(octokit, owner, repo, issueNumber, 10)
-
-  const labeledDurations = labeledTimes.getLabeledDurations(timeline, labels)
-  const projectStateDurations = labeledTimes.getProjectStateDuration(timeline, projectColumns)
-
-  const body = `
-${additionalIssueComment}\n
-${labeledTimes.getLabeledIssueBody(labeledDurations)}\n
-${labeledTimes.getProjectStateIssueBody(projectStateDurations)}\n
-`
-
-  await octokit.rest.issues.createComment({
-    owner,
-    repo,
-    issue_number: issueNumber,
-    body
-  });
-
-  const convertDurationFunc = (acc, val) => {
-    acc[val.name] = val
-    return acc
-  }
-
-  core.setOutput("labeled_duration_details", JSON.stringify({
-    issue: {
-      number: github.context.issue.number,
-      title: issueDetails.title,
-      labels: issueDetails.labels.map(label => label.name),
-      createdAt: issueDetails.created_at,
-      closedAt: issueDetails.closed_at,
-    },
-    labeledDurations: labeledDurations.reduce(convertDurationFunc, {}),
-    projectStateDurations: projectStateDurations.reduce(convertDurationFunc, {})
-  }));
-}
-
-run();
+run()
 
 })();
 
