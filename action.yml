@@ -1,7 +1,7 @@
 name: 'Test actions'
 description: 'Test'
 inputs:
-  access-token:
+  access_token:
     description: 'GitHub access token'
     required: false
     default: ${{ github.token }}

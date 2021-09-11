@@ -4,7 +4,7 @@ const labeledTimes = require('./labeledTimes.js')
 const getTimeline = require('./getTimeline.js')
 
 module.exports = async function() {
-  const token = core.getInput('access-token')
+  const token = core.getInput('access_token')
   const octokit = github.getOctokit(token)
 
   const owner = core.getInput('repository_owner') || github.context.repo.owner

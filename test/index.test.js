@@ -27,7 +27,7 @@ github.getOctokit = jest.fn().mockReturnValue(mockedOctokit)
 
 core.getInput = jest.fn().mockImplementation(key => {
   switch(key) {
-    case 'access-token': return 'dummy-access-token'
+    case 'access_token': return 'dummy-access-token'
     case 'repository_owner': return 'owner'
     case 'repository_name': return 'repo'
     case 'issue_number': return 123

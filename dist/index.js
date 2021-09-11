@@ -6352,7 +6352,7 @@ const labeledTimes = __nccwpck_require__(343)
 const getTimeline = __nccwpck_require__(372)
 
 module.exports = async function() {
-  const token = core.getInput('access-token')
+  const token = core.getInput('access_token')
   const octokit = github.getOctokit(token)
 
   const owner = core.getInput('repository_owner') || github.context.repo.owner
