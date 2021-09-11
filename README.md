@@ -15,7 +15,7 @@ npm run build
 ## Usage
 
 ```yml
-- uses: ./
+- uses: piyoppi/actions-labeled-duration@cc59fe06e7f8ce93dff689efc1bdc87ae29e28ac # (A commit hash containing the Actions you want to use.)
   with:
     # Tracking labels (Splitted comma)
     labels: label1,label2
@@ -65,4 +65,96 @@ Details about the time it took to solve the issue (JSON string).
     }
   }
 }
+```
+
+## Sample
+
+### Comments on total time labeled
+
+```yml
+
+name: issue-closed
+
+on:
+  issues:
+    types:
+      - closed
+
+jobs:
+  closed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report
+        id: report
+        uses: piyoppi/actions-labeled-duration@cc59fe06e7f8ce93dff689efc1bdc87ae29e28ac
+        with:
+          labels: Todo,Doing
+          issue_comment: '⌛It shows how long the state of the project is taking.'
+```
+
+### Comment on the total time spent on the project
+
+```yml
+name: issue-closed
+
+on:
+  issues:
+    types:
+      - closed
+
+jobs:
+  closed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report
+        id: report
+        uses: piyoppi/actions-labeled-duration@cc59fe06e7f8ce93dff689efc1bdc87ae29e28ac
+        with:
+          project_columns: Todo,Doing
+          issue_comment: '⌛It shows how long the state of the project is taking.'
+```
+
+### Output the result as a JSON file
+
+Here is an example of writing the output results to an `issue-tracked` branch.
+
+```yml
+name: issue-closed
+
+on:
+  issues:
+    types:
+      - closed
+
+jobs:
+  closed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report
+        id: report
+        uses: piyoppi/actions-labeled-duration@cc59fe06e7f8ce93dff689efc1bdc87ae29e28ac
+        with:
+          labels: label1,label2
+          project_columns: Todo,Doing
+          issue_comment: '⌛It shows how long the state of the project is taking.'
+          issue_number: ${{ github.event.inputs.issue_number }}
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: issue-tracked
+      - name: write
+        shell: bash
+        env:
+          OUTPUTTED_CONTENT: ${{ steps.report.outputs.labeled_duration_details }}
+        run: |
+          git config --global user.email "bot@garakuta-toolbox.com"
+          git config --global user.name "piyoppi-bot"
+          branch='issue-tracked'
+          dir='./issue-tracked'
+          if [ ! -d $dir ]; then
+            mkdir $dir
+          fi
+          echo $OUTPUTTED_CONTENT > "$dir/${{ github.event.issue.number }}.json"
+          git add .
+          git commit -m "add / replace ${{ github.event.issue.number }}.json"
 ```
