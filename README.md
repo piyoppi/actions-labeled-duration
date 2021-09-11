@@ -158,3 +158,9 @@ jobs:
           git add .
           git commit -m "add / replace ${{ github.event.issue.number }}.json"
 ```
+
+## License
+
+The scripts in the [/src](src/) directory and documents of this project are released under the [MIT License](LICENSE).
+
+The artifacts in the [/dist](dist/) directory created by this project contain third party material. For licensing and other copyright information, see [dist/licenses.txt](dist/licenses.txt).
