@@ -15,7 +15,7 @@ npm run build
 ## Usage
 
 ```yml
-- uses: piyoppi/actions-labeled-duration@cc59fe06e7f8ce93dff689efc1bdc87ae29e28ac # (A commit hash containing the Actions you want to use.)
+- uses: piyoppi/actions-labeled-duration@v1 # (or a specific commit hash or semver (ex: v1.0.0))
   with:
     # Tracking labels (Splitted comma)
     labels: label1,label2
