@@ -9,7 +9,7 @@
     "dayjs": "^1.10.6"
   },
   "devDependencies": {
-    "@vercel/ncc": "^0.29.2",
+    "@vercel/ncc": "^0.31.1",
     "jest": "^27.3.1"
   }
 }
